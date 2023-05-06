@@ -1,53 +1,51 @@
-import time
-from pprint import pprint
+from functions.simulations import start_simulation
 from models import Sun, SolarPanel
-from functions import show_plot
+from functions.plots import show_plot
+from pprint import pprint
+import matplotlib.pyplot as plt
+from datetime import date
+from functions.calculations import *
 
-
-START_HOUR = 6
-END_HOUR = 18
-START_TIME = START_HOUR * 60
-END_TIME = END_HOUR * 60
-WORK_INTERVAL = END_TIME - START_TIME
-
-DISCRETENESS = 60  # minutes
-
-DAYS_OF_YEAR = 360
-LONGITUDE = 37.63
 LATITUDE = 55.74
+LONGITUDE = 37.63
+GMT_DELTA = 3
+DISCRETENESS = 200
+STEP = 1
 
-GREENWICH_TIME_DELTA = 3
+DATE = date(2022, 6, 5)
+DAYS = DATE.timetuple().tm_yday
+
+START = 8
+END = 16
+
+B = calc_b_coefficient(DAYS)
+DECLINATION = calc_declination_angle(B)
 
 
 if __name__ == '__main__':
-    sun_position_data = []
-    solar_panel_position_data = []
-    time_data = []
+    sun = Sun(
+        LONGITUDE,
+        LATITUDE,
+        GMT_DELTA,
+        DAYS
+    )
+    panel = SolarPanel(
+        LONGITUDE,
+        LATITUDE,
+        GMT_DELTA,
+        DAYS,
+        DISCRETENESS
+    )
+    data = start_simulation(sun, panel, 8, 16, STEP)
 
-    solar_panel = SolarPanel()
-    sun = Sun(LONGITUDE, LATITUDE, GREENWICH_TIME_DELTA)
+    pprint(data[2][:10])
+    pprint(data[1][:10])
+    print(len(data[2]))
+    show_plot(*data[:-1])
 
-    sun.update_position(DAYS_OF_YEAR, START_TIME / 60)
-    solar_panel.change_angle(sun.azimuth_angle, sun.elevation_angle)
-    for i in range(START_TIME, END_TIME, 1):
-        # print(f'Now is {i / 60} hours')
-        # sun position is updating
-        previous_azimuth = sun.azimuth_angle
-        sun.update_position(DAYS_OF_YEAR, i / 60)
+    summary_irradiation = sum(map(lambda x: x * STEP / 60, data[-1]))
 
-        if previous_azimuth > sun.azimuth_angle:
-            print('Add')
-            sun.second_part = True
-            sun.update_position(DAYS_OF_YEAR, i / 60)
+    print(summary_irradiation)
 
-        if not i % DISCRETENESS:
-            solar_panel.change_angle(sun.azimuth_angle, sun.elevation_angle)
-
-        # print(f'Sun position: {sun.elevation_angle, sun.azimuth_angle}')
-        # print(f'Solar panel angles: {solar_panel.elevation_angle, solar_panel.azimuth_angle}')
-        solar_panel_position_data.append([solar_panel.elevation_angle, solar_panel.azimuth_angle])
-        sun_position_data.append([sun.elevation_angle, sun.azimuth_angle])
-        time_data.append(i / 60)
-        time.sleep(0)
-
-    show_plot(time_data, sun_position_data, solar_panel_position_data)
+    plt.plot(data[0], data[-1])
+    plt.show()
