@@ -9,8 +9,12 @@ def calc_theta_z_angle(latitude, declination, hra):
 
 
 def calc_theta_angle(theta_z, beta, gamma_solar, gamma_surface):
+    # print(theta_z, beta, gamma_solar, gamma_surface)
+    # print('rounded')
+    # print(round(cos(theta_z) * cos(beta) + sin(theta_z) * sin(beta) * cos(gamma_solar - gamma_surface), 4))
+
     return acos(
-        cos(theta_z) * cos(beta) + sin(theta_z) * sin(beta) * cos(gamma_solar - gamma_surface)
+        round(cos(theta_z) * cos(beta) + sin(theta_z) * sin(beta) * cos(gamma_solar - gamma_surface), 4)
     )
 
 

@@ -46,19 +46,15 @@ class SolarPanel:
         self.days = days
 
         # initializing
-        self.azimuth_angle = 0  # 0 -- north, clockwise
-        self.elevation_angle = 90
+        self.position = (pi / 2, 0)  # 0 azimuth -- north, clockwise
         self.theta = 0
         self.theta_z = 0
         self.beta = 0
-        self.position = (pi / 2, 0)
 
     def update(self, sun_elevation, sun_azimuth, hour):
         if not hour * 60 % self.discreteness:
-            self.azimuth_angle = sun_azimuth
-            self.elevation_angle = sun_elevation
+            self.position = (sun_elevation, sun_azimuth)
             self.beta = pi / 2 - sun_elevation
-            self.position = (self.elevation_angle, self.azimuth_angle)
 
         hra = calc_hra(self.longitude, self.gtm_delta, hour, self.b)
         self.theta_z = calc_theta_z_angle(
@@ -70,11 +66,12 @@ class SolarPanel:
             self.theta_z,
             self.beta,
             sun_azimuth,
-            self.azimuth_angle
+            self.position[1]
         )
 
-    def calc_insolation(self, ):
-        return calc_radiation(self.beta, 1.04, 0.445, self.theta_z, self.theta, 0.6)
+    def calc_insolation(self, all_sky_irradiance, k_t, albedo):
+        all_sky_irradiance *= 0.0036
+        return calc_radiation(self.beta, all_sky_irradiance, k_t, self.theta_z, self.theta, albedo)
 
 
 if __name__ == '__main__':

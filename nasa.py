@@ -26,27 +26,29 @@ def get_data(
               f'&format=json'
     )
     data = response.json()
-    return parse(data['properties']['parameter'])
+    pprint(data)
+    return parse(data['properties']['parameter'], data['parameters'])
 
 
-def parse(data):
+def parse(data, parameters):
     new_data = {}
     for parameter in data:
-        new_data[parameter] = {}
+        longname = parameters[parameter]['longname']
+        new_data[longname] = {}
         for key in data[parameter]:
-            new_data[parameter][key[8:]] = data[parameter][key]
-
+            new_data[longname][key[8:]] = data[parameter][key]
+    pprint(new_data)
     return new_data
 
 
 if __name__ == '__main__':
     longitude_ = 37.63
     latitude_ = 55.74
-    data = get_data(longitude_, latitude_, date(2022, 6, 5))
+    data_ = get_data(longitude_, latitude_, date(2022, 6, 5))
 
-    time = list(range(0, 24))
-    pprint(time)
+    time_ = list(range(0, 24))
 
-    for parameter in data:
-        plt.plot(time, data[parameter].values())
+    for parameter_ in data_:
+        plt.plot(time_, data_[parameter_].values(), label=parameter_)
+        plt.legend()
         plt.show()
