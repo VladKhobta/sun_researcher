@@ -23,8 +23,13 @@ if __name__ == '__main__':
         LATITUDE,
         GMT_DELTA,
         DAYS,
-        DISCRETENESS
+        DISCRETENESS,
+        True
     )
+    panel.position = (
+        0, 0
+    )
+    panel.beta = pi
 
     # start simulation
     data = tracking_simulation(
@@ -43,8 +48,6 @@ if __name__ == '__main__':
     summary_irradiation = sum(data[-2])
 
     print(summary_irradiation)
-    print(min([r[1] for r in data[1]]))
-    print(max([r[1] for r in data[1]]))
 
     # pprint(data[-1])
     # pprint(data[-2])

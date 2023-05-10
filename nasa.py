@@ -1,8 +1,10 @@
+import json
 from math import floor, ceil
 from datetime import date, datetime, time
 from pprint import pprint
 import requests
 from matplotlib import pyplot as plt
+import os
 
 API = 'https://power.larc.nasa.gov/api/temporal'
 
@@ -13,6 +15,12 @@ def get_data(
         utc_date: date,
 ):
     start = end = utc_date.strftime("%Y%m%d")
+
+    json_path = os.path.dirname(__file__) + f'/nasa_data/{start}.json'
+    print(json_path)
+    if os.path.exists(json_path):
+        with open(json_path, 'r') as data:
+            return json.load(data)
 
     response = requests.get(
         API + f'/hourly/point?'
@@ -27,7 +35,10 @@ def get_data(
     )
     data = response.json()
     pprint(data)
-    return parse(data['properties']['parameter'], data['parameters'])
+    parsed = parse(data['properties']['parameter'], data['parameters'])
+    with open(json_path, 'w') as new_data:
+        json.dump(parsed, new_data)
+    return parsed
 
 
 def parse(data, parameters):

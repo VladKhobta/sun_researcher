@@ -32,7 +32,7 @@ class Sun:
 
 
 class SolarPanel:
-    def __init__(self, longitude, latitude, gtm_delta, days, discreteness=30):
+    def __init__(self, longitude, latitude, gtm_delta, days, discreteness=30, static=False):
         # CONSTS
         # days-based
         self.b = calc_b_coefficient(days)
@@ -44,17 +44,26 @@ class SolarPanel:
         self.gtm_delta = gtm_delta
         self.discreteness = discreteness
         self.days = days
+        self.static = static
 
         # initializing
-        self.position = (pi / 2, 0)  # 0 azimuth -- north, clockwise
+        self.position = (
+            pi / 8,
+            - pi / 2
+        )  # 0 azimuth -- south, clockwise
+        if self.static:
+            self.position = (
+                pi / 4,
+                0
+            )
         self.theta = 0
         self.theta_z = 0
-        self.beta = 0
+        self.beta = pi / 2 - self.position[0]
 
     def update(self, sun_elevation, sun_azimuth, hour):
-        if not hour * 60 % self.discreteness:
+        if not hour * 60 % self.discreteness and not self.static:
             self.position = (sun_elevation, sun_azimuth)
-            self.beta = pi / 2 - sun_elevation
+            self.beta = pi / 2 - self.position[0]
 
         hra = calc_hra(self.longitude, self.gtm_delta, hour, self.b)
         self.theta_z = calc_theta_z_angle(
@@ -71,7 +80,23 @@ class SolarPanel:
 
     def calc_insolation(self, all_sky_irradiance, k_t, albedo):
         all_sky_irradiance *= 0.0036
-        return calc_radiation(self.beta, all_sky_irradiance, k_t, self.theta_z, self.theta, albedo)
+        # print(
+        #     all_sky_irradiance,
+        #     k_t,
+        #     albedo
+        # )
+        if k_t < 0 or albedo < 0:
+            return 0
+        rad = calc_radiation(
+            self.beta,
+            all_sky_irradiance,
+            k_t,
+            self.theta_z,
+            self.theta,
+            albedo
+        )
+        print('Irradiation:', rad)
+        return rad
 
 
 if __name__ == '__main__':

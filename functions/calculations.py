@@ -58,11 +58,24 @@ def calc_radiation(beta, all_sky_downward_irradiance, k_t, theta_z, theta, ro):
     flat_directed_irradiation = (1 - d_w_ratio) * all_sky_downward_irradiance
     flat_diffused_irradiation = d_w_ratio * all_sky_downward_irradiance
 
+    print(flat_directed_irradiation)
+
     directed_irradiation = flat_directed_irradiation * cos(theta) / cos(theta_z)
     diffused_irradiation = flat_diffused_irradiation * (1 + cos(beta)) / 2
     reflected_irradiation = ro * all_sky_downward_irradiance * (1 - cos(beta)) / 2
 
-    insolation = directed_irradiation + diffused_irradiation + reflected_irradiation
+    if cos(theta) / cos(theta_z):  # theta_z -> pi / 2 => cos(theta_z) -> infinity
+        directed_irradiation = -1
+
+    print(f'\nInsolation particles\n'
+          f'{directed_irradiation}\n'
+          f'{diffused_irradiation}\n'
+          f'{reflected_irradiation}\n')
+    print(f'Angles\n'
+          f'{theta}\n'
+          f'{theta_z}\n')
+
+    insolation = max(0, directed_irradiation) + max(0, diffused_irradiation) + max(0, reflected_irradiation)
 
     return insolation
 
