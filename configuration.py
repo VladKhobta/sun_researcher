@@ -4,7 +4,7 @@ from datetime import date
 LATITUDE = 55.74
 LONGITUDE = 37.63
 GMT_DELTA = 3
-DISCRETENESS = 500
+DISCRETENESS = 1000
 STEP = 1
 
 DATE = date(2022, 6, 5)

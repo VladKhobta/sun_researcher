@@ -1,6 +1,4 @@
-from math import sin, cos, radians, degrees, asin, acos, sqrt, copysign, pi
 from functions.calculations import *
-from functions.plots import show_plot
 
 
 class Sun:
@@ -23,12 +21,14 @@ class Sun:
         self.position = self.get_current_position(hours)
 
     def get_current_position(self, hour):
-        hra = calc_hra(self.longitude, self.gtm_delta, hour, self.b)
-
-        theta_z = calc_theta_z_angle(self.latitude, self.declination, hra)
-        azimuth = calc_azimuth_angle(self.latitude, self.declination, theta_z, hra)
-
-        return pi / 2 - theta_z, azimuth
+        return calc_solar_position(
+            self.longitude,
+            self.latitude,
+            self.gtm_delta,
+            self.declination,
+            hour,
+            self.b
+        )
 
 
 class SolarPanel:

@@ -1,4 +1,4 @@
-from functions import tracking_simulation
+from functions.simulations import tracking_simulation
 from models import Sun, SolarPanel
 from functions.plots import show_plot
 from pprint import pprint

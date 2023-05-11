@@ -60,7 +60,10 @@ def calc_radiation(beta, all_sky_downward_irradiance, k_t, theta_z, theta, ro):
 
     print(flat_directed_irradiation)
 
-    directed_irradiation = flat_directed_irradiation * cos(theta) / cos(theta_z)
+    cos_theta = max(0.0, cos(theta))
+    cos_theta_z = max(cos(radians(85)), cos(theta_z))
+
+    directed_irradiation = flat_directed_irradiation * cos_theta / cos_theta_z
     diffused_irradiation = flat_diffused_irradiation * (1 + cos(beta)) / 2
     reflected_irradiation = ro * all_sky_downward_irradiance * (1 - cos(beta)) / 2
 
@@ -79,3 +82,11 @@ def calc_radiation(beta, all_sky_downward_irradiance, k_t, theta_z, theta, ro):
 
     return insolation
 
+
+def calc_solar_position(longitude, latitude, gtm_delta, declination, hour, b):
+    hra = calc_hra(longitude, gtm_delta, hour, b)
+
+    theta_z = calc_theta_z_angle(latitude, declination, hra)
+    azimuth = calc_azimuth_angle(latitude, declination, theta_z, hra)
+
+    return pi / 2 - theta_z, azimuth
